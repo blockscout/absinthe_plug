@@ -49,7 +49,7 @@ add "&raw" to the end of the URL within a browser.
         defaultWebsocketUrl: <%= socket_url %>,
         subscriptionsClientBuilder: absintheSubscriptionsClientBuilder,
       <% end %>
-      defaultQuery: '<%= query_string %>',
+      defaultQuery: '<%= sanitize(query_string) %>',
       defaultVariables: '<%= variables_string %>',
       defaultHeaders: <%= default_headers %>
     });

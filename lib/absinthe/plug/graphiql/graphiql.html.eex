@@ -90,7 +90,7 @@ add "&raw" to the end of the URL within a browser.
         fetcher,
         onEditQuery: onEditQuery,
         onEditVariables: onEditVariables,
-        query: '<%= query_string %>',
+        query: '<%= sanitize(query_string) %>',
         response: '<%= result_string %>',
         variables: '<%= variables_string %>',
       }),

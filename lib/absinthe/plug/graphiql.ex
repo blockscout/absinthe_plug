@@ -473,4 +473,11 @@ defmodule Absinthe.Plug.GraphiQL do
   defp normalize_socket_url(%{socket_url: url} = config, _) do
     %{config | socket_url: "'#{url}'"}
   end
+
+  defp sanitize(input) do
+    input
+    |> to_string()
+    |> Plug.HTML.html_escape()
+    |> String.replace("&quot;", "\"")
+  end
 end
