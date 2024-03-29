@@ -139,11 +139,13 @@ defmodule Absinthe.Plug do
     :pubsub,
     :analyze_complexity,
     :max_complexity,
+    :token_limit,
     :transport_batch_payload_key
   ]
   @raw_options [
     :analyze_complexity,
-    :max_complexity
+    :max_complexity,
+    :token_limit
   ]
 
   @type function_name :: atom
@@ -154,7 +156,7 @@ defmodule Absinthe.Plug do
   - `:no_query_message` -- (Optional) Message to return to the client if no query is provided (default: "No query document supplied").
   - `:json_codec` -- (Optional) A `module` or `{module, Keyword.t}` dictating which JSON codec should be used (default: `Jason`). The codec module should implement `encode!/2` (e.g., `module.encode!(body, opts)`).
   - `:pipeline` -- (Optional) `{module, atom}` reference to a 2-arity function that will be called to generate the processing pipeline. (default: `{Absinthe.Plug, :default_pipeline}`).
-  - `:document_providers` -- (Optional) A `{module, atom}` reference to a 1-arity function that will be called to determine the document providers that will be used to process the request. (default: `{Absinthe.Plug, :default_document_providers}`, which configures `Absinthe.Plug.DocumentProvider.Default` as the lone document provider). A simple list of document providers can also be given. See `Absinthe.Plug.DocumentProvider` for more information about document providers, their role in procesing requests, and how you can define and configure your own.
+  - `:document_providers` -- (Optional) A `{module, atom}` reference to a 1-arity function that will be called to determine the document providers that will be used to process the request. (default: `{Absinthe.Plug, :default_document_providers}`, which configures `Absinthe.Plug.DocumentProvider.Default` as the lone document provider). A simple list of document providers can also be given. See `Absinthe.Plug.DocumentProvider` for more information about document providers, their role in processing requests, and how you can define and configure your own.
   - `:schema` -- (Required, if not handled by Mix.Config) The Absinthe schema to use. If a module name is not provided, `Application.get_env(:absinthe, :schema)` will be attempt to find one.
   - `:serializer` -- (Optional) Similar to `:json_codec` but allows the use of serialization formats other than JSON, like MessagePack or Erlang Term Format. Defaults to whatever is set in `:json_codec`.
   - `:content_type` -- (Optional) The content type of the response. Should probably be set if `:serializer` option is used. Defaults to `"application/json"`.
@@ -163,6 +165,7 @@ defmodule Absinthe.Plug do
   - `:pubsub` -- (Optional) Pub Sub module for Subscriptions.
   - `:analyze_complexity` -- (Optional) Set whether to calculate the complexity of incoming GraphQL queries.
   - `:max_complexity` -- (Optional) Set the maximum allowed complexity of the GraphQL query. If a document’s calculated complexity exceeds the maximum, resolution will be skipped and an error will be returned in the result detailing the calculated and maximum complexities.
+  - `:token_limit` -- (Optional) Set a limit on the number of allowed parseable tokens in the GraphQL query. Queries with exceedingly high token counts can be expensive to parse. If a query's token count exceeds the set limit, an error will be returned during Absinthe parsing (default: `:infinity`).
   - `:transport_batch_payload_key` -- (Optional) Set whether or not to nest Transport Batch request results in a `payload` key. Older clients expected this key to be present, but newer clients have dropped this pattern. (default: `true`)
 
   """
@@ -179,6 +182,7 @@ defmodule Absinthe.Plug do
             | {module, atom},
           analyze_complexity: boolean,
           max_complexity: non_neg_integer | :infinity,
+          token_limit: non_neg_integer | :infinity,
           serializer: module | {module, Keyword.t()},
           content_type: String.t(),
           before_send: {module, atom},
